@@ -29,16 +29,16 @@
     }
 
     .card{
-  position: relative; /* ważne: to będzie "granica" */
-  z-index: 2;
-  text-align: center;
-  padding: 22px;
-  border-radius: 18px;
-  background: rgba(255,255,255,.2);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 10px 30px rgba(0,0,0,.2);
-  max-width: min(520px, 88vw);
-}
+      position:relative;
+      z-index:2;
+      text-align:center;
+      padding:22px;
+      border-radius:18px;
+      background: rgba(255,255,255,.2);
+      backdrop-filter: blur(6px);
+      box-shadow:0 10px 30px rgba(0,0,0,.2);
+      max-width:min(520px, 88vw);
+    }
 
     img{
       width:min(360px,70vw);
@@ -57,13 +57,12 @@
     }
 
     .buttons{
-  margin-top: 14px;
-  display:flex;
-  justify-content:center;
-  gap:18px;
-  position: relative;
-  height: 64px;       /* ważne: daje obszar na uciekanie */
-}
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+      gap:18px;
+      position:relative;
+    }
 
     button{
       font-size:18px;
@@ -88,11 +87,14 @@
 
     /* Uciekający przycisk: pozycjonujemy go "fixed", żeby uciekał po całym ekranie */
     #noBtn{
-  position: absolute;
-  left: 60%;
-  top: 6px;
-  transform: translateX(0);
-}
+      background:white;
+      color:#ff004c;
+      position:fixed; /* klucz: może uciekać po całej stronie */
+      left:50%;
+      top:50%;
+      transform: translate(110px, 90px); /* start w okolicy przycisku "Tak" */
+      will-change: left, top, transform;
+    }
 
     .heart{
       position:absolute;
@@ -124,55 +126,77 @@
     </div>
   </main>
 
- <script>
-  const yesBtn = document.getElementById("yesBtn");
-  const noBtn  = document.getElementById("noBtn");
-  const arena  = document.querySelector(".buttons"); // ograniczamy do prostokąta
+  <script>
+    /* SERDUSZKA */
+    const heartsLayer = document.getElementById("hearts");
+    const HEARTS = 70;
 
-  yesBtn.addEventListener("click", ()=>{
-    alert("💖 Wiedziałem! Najpiękniejsza walentynka na świecie 💖");
-  });
+    function rand(min, max){ return Math.random()*(max-min)+min; }
 
-  function moveNoInsideCard(){
-    const pad = 8;
+    for(let i=0;i<HEARTS;i++){
+      const h = document.createElement("div");
+      h.className="heart";
+      h.textContent="❤";
+      h.style.left=(Math.random()*innerWidth)+"px";
+      h.style.top=(Math.random()*innerHeight)+"px";
+      h.style.fontSize=(14+Math.random()*20)+"px";
+      h.style.animationDuration=(0.4+Math.random())+"s";
+      heartsLayer.appendChild(h);
+    }
 
-    const a = arena.getBoundingClientRect();
-    const b = noBtn.getBoundingClientRect();
+    // delikatnie „ożywiaj” rozmieszczenie serduszek
+    setInterval(() => {
+      const all = heartsLayer.children;
+      for(let i=0;i<Math.ceil(HEARTS*0.18);i++){
+        const el = all[Math.floor(Math.random()*all.length)];
+        el.style.left=(Math.random()*innerWidth)+"px";
+        el.style.top=(Math.random()*innerHeight)+"px";
+      }
+    }, 650);
 
-    // Maksymalny ruch w obrębie "areny"
-    const maxX = Math.max(pad, a.width  - b.width  - pad);
-    const maxY = Math.max(pad, a.height - b.height - pad);
+    /* PRZYCISKI */
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
 
-    const x = pad + Math.random() * (maxX - pad);
-    const y = pad + Math.random() * (maxY - pad);
+    yesBtn.addEventListener("click", ()=>{
+      alert("💖 Wiedziałem! Najpiękniejsza walentynka na świecie 💖");
+    });
 
-    // Ustawiamy pozycję względem .buttons (bo #noBtn jest absolute)
-    noBtn.style.left = x + "px";
-    noBtn.style.top  = y + "px";
-  }
+    // Uciekanie: losujemy pozycję, ale pilnujemy żeby przycisk nie wyszedł poza ekran
+    function moveNoButtonStrong(){
+      const padding = 12;   // margines od krawędzi
+      const w = noBtn.offsetWidth;
+      const h = noBtn.offsetHeight;
 
-  // desktop: zbliżenie kursora
-  noBtn.addEventListener("pointerenter", moveNoInsideCard);
+      // większy rozrzut = „bardziej ucieka”
+      // losujemy docelowe miejsce praktycznie na całym ekranie
+      const x = rand(padding, window.innerWidth  - w - padding);
+      const y = rand(padding, window.innerHeight - h - padding);
 
-  // mobile: próba dotknięcia
-  noBtn.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    moveNoInsideCard();
-  }, { passive:false });
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+      noBtn.style.transform = "translate(0,0)";
+    }
 
-  // jakby ktoś jednak trafił:
-  noBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    moveNoInsideCard();
-  });
+    // PC: zbliżenie kursora
+    noBtn.addEventListener("pointerenter", moveNoButtonStrong);
 
-  // na start i przy zmianie rozmiaru/obrocie
-  window.addEventListener("resize", moveNoInsideCard);
-  moveNoInsideCard();
-</script>
+    // Telefon/tablet: dotyk (hover nie istnieje, więc uciekamy przy próbie tapnięcia)
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault(); // żeby nie „kliknąć” przypadkiem
+      moveNoButtonStrong();
+    }, { passive: false });
 
+    // Bonus: jeśli ktoś jednak go trafi (szacun!), to też uciekaj
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      moveNoButtonStrong();
+    });
 
+    // Po zmianie rozmiaru ekranu (obrót telefonu) trzymaj go w granicach
+    window.addEventListener("resize", () => {
+      moveNoButtonStrong();
+    });
+  </script>
 </body>
 </html>
-
-

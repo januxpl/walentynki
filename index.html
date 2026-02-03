@@ -138,38 +138,39 @@
     alert("💖 Wiedziałem! Najpiękniejsza walentynka na świecie 💖");
   });
 
-  // PSYCHOLOGIA ❤️
+  // 💭 PULA TEKSTÓW "NIE"
   const noTexts = [
     "Nie 🙈",
     "Na pewno nie?",
     "Na 100%?",
     "A może jednak…?",
     "No weź 🥺",
-    "Nie bądź taka 💔",
-    "Ostatnia szansa 😳",
-    "Dobra… żartowałam 😅"
+    "Serio?",
+    "Nie rób mi tego 💔",
+    "Zastanów się 😳",
+    "Jeszcze chwila…",
+    "Nie bądź taka 😅",
+    "Serduszko mówi TAK ❤️",
+    "Palec się omsknął 😏"
   ];
 
-  let noClicks = 0;
+  let lastIndex = -1;
 
   runawayBtn.addEventListener("click", ()=>{
-    noClicks++;
+    let index;
+    do {
+      index = Math.floor(Math.random() * noTexts.length);
+    } while (index === lastIndex);
 
-    if(noClicks < noTexts.length){
-      runawayBtn.textContent = noTexts[noClicks];
-    } else {
-      // finał
-      runawayBtn.style.opacity = "0";
-      runawayBtn.style.transform = "scale(0.5)";
-      setTimeout(()=>{
-        runawayBtn.remove();
-      }, 300);
-    }
+    lastIndex = index;
+    runawayBtn.textContent = noTexts[index];
   });
 </script>
 
+
 </body>
 </html>
+
 
 
 

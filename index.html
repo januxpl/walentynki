@@ -29,16 +29,16 @@
     }
 
     .card{
-      position:relative;
-      z-index:2;
-      text-align:center;
-      padding:22px;
-      border-radius:18px;
-      background: rgba(255,255,255,.2);
-      backdrop-filter: blur(6px);
-      box-shadow:0 10px 30px rgba(0,0,0,.2);
-      max-width:min(520px, 88vw);
-    }
+  position: relative; /* ważne: to będzie "granica" */
+  z-index: 2;
+  text-align: center;
+  padding: 22px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.2);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,.2);
+  max-width: min(520px, 88vw);
+}
 
     img{
       width:min(360px,70vw);
@@ -57,12 +57,13 @@
     }
 
     .buttons{
-      margin-top:14px;
-      display:flex;
-      justify-content:center;
-      gap:18px;
-      position:relative;
-    }
+  margin-top: 14px;
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  position: relative;
+  height: 64px;       /* ważne: daje obszar na uciekanie */
+}
 
     button{
       font-size:18px;
@@ -87,14 +88,11 @@
 
     /* Uciekający przycisk: pozycjonujemy go "fixed", żeby uciekał po całym ekranie */
     #noBtn{
-      background:white;
-      color:#ff004c;
-      position:fixed; /* klucz: może uciekać po całej stronie */
-      left:50%;
-      top:50%;
-      transform: translate(110px, 90px); /* start w okolicy przycisku "Tak" */
-      will-change: left, top, transform;
-    }
+  position: absolute;
+  left: 60%;
+  top: 6px;
+  transform: translateX(0);
+}
 
     .heart{
       position:absolute;
@@ -129,59 +127,52 @@
  <script>
   const yesBtn = document.getElementById("yesBtn");
   const noBtn  = document.getElementById("noBtn");
+  const arena  = document.querySelector(".buttons"); // ograniczamy do prostokąta
 
   yesBtn.addEventListener("click", ()=>{
     alert("💖 Wiedziałem! Najpiękniejsza walentynka na świecie 💖");
   });
 
-  function getViewportSize() {
-    // visualViewport działa poprawnie na mobile (iOS/Android)
-    if (window.visualViewport) {
-      return {
-        w: window.visualViewport.width,
-        h: window.visualViewport.height
-      };
-    }
-    return {
-      w: window.innerWidth,
-      h: window.innerHeight
-    };
-  }
+  function moveNoInsideCard(){
+    const pad = 8;
 
-  function moveNoButtonStrong(){
-    const margin = 16; // bezpieczny margines od krawędzi
-    const rect = noBtn.getBoundingClientRect();
-    const vp = getViewportSize();
+    const a = arena.getBoundingClientRect();
+    const b = noBtn.getBoundingClientRect();
 
-    const maxX = vp.w - rect.width  - margin;
-    const maxY = vp.h - rect.height - margin;
+    // Maksymalny ruch w obrębie "areny"
+    const maxX = Math.max(pad, a.width  - b.width  - pad);
+    const maxY = Math.max(pad, a.height - b.height - pad);
 
-    const x = Math.max(margin, Math.random() * maxX);
-    const y = Math.max(margin, Math.random() * maxY);
+    const x = pad + Math.random() * (maxX - pad);
+    const y = pad + Math.random() * (maxY - pad);
 
+    // Ustawiamy pozycję względem .buttons (bo #noBtn jest absolute)
     noBtn.style.left = x + "px";
     noBtn.style.top  = y + "px";
   }
 
-  // PC
-  noBtn.addEventListener("pointerenter", moveNoButtonStrong);
+  // desktop: zbliżenie kursora
+  noBtn.addEventListener("pointerenter", moveNoInsideCard);
 
-  // Telefon
+  // mobile: próba dotknięcia
   noBtn.addEventListener("touchstart", (e) => {
     e.preventDefault();
-    moveNoButtonStrong();
+    moveNoInsideCard();
   }, { passive:false });
 
-  // Na wypadek „cudem kliknięcia”
-  noBtn.addEventListener("click", (e)=>{
+  // jakby ktoś jednak trafił:
+  noBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    moveNoButtonStrong();
+    moveNoInsideCard();
   });
 
-  // Obrót telefonu / zmiana rozmiaru
-  window.addEventListener("resize", moveNoButtonStrong);
+  // na start i przy zmianie rozmiaru/obrocie
+  window.addEventListener("resize", moveNoInsideCard);
+  moveNoInsideCard();
 </script>
+
 
 </body>
 </html>
+
 

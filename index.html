@@ -126,77 +126,62 @@
     </div>
   </main>
 
-  <script>
-    /* SERDUSZKA */
-    const heartsLayer = document.getElementById("hearts");
-    const HEARTS = 70;
+ <script>
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn  = document.getElementById("noBtn");
 
-    function rand(min, max){ return Math.random()*(max-min)+min; }
+  yesBtn.addEventListener("click", ()=>{
+    alert("💖 Wiedziałem! Najpiękniejsza walentynka na świecie 💖");
+  });
 
-    for(let i=0;i<HEARTS;i++){
-      const h = document.createElement("div");
-      h.className="heart";
-      h.textContent="❤";
-      h.style.left=(Math.random()*innerWidth)+"px";
-      h.style.top=(Math.random()*innerHeight)+"px";
-      h.style.fontSize=(14+Math.random()*20)+"px";
-      h.style.animationDuration=(0.4+Math.random())+"s";
-      heartsLayer.appendChild(h);
+  function getViewportSize() {
+    // visualViewport działa poprawnie na mobile (iOS/Android)
+    if (window.visualViewport) {
+      return {
+        w: window.visualViewport.width,
+        h: window.visualViewport.height
+      };
     }
+    return {
+      w: window.innerWidth,
+      h: window.innerHeight
+    };
+  }
 
-    // delikatnie „ożywiaj” rozmieszczenie serduszek
-    setInterval(() => {
-      const all = heartsLayer.children;
-      for(let i=0;i<Math.ceil(HEARTS*0.18);i++){
-        const el = all[Math.floor(Math.random()*all.length)];
-        el.style.left=(Math.random()*innerWidth)+"px";
-        el.style.top=(Math.random()*innerHeight)+"px";
-      }
-    }, 650);
+  function moveNoButtonStrong(){
+    const margin = 16; // bezpieczny margines od krawędzi
+    const rect = noBtn.getBoundingClientRect();
+    const vp = getViewportSize();
 
-    /* PRZYCISKI */
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn  = document.getElementById("noBtn");
+    const maxX = vp.w - rect.width  - margin;
+    const maxY = vp.h - rect.height - margin;
 
-    yesBtn.addEventListener("click", ()=>{
-      alert("💖 Wiedziałem! Najpiękniejsza walentynka na świecie 💖");
-    });
+    const x = Math.max(margin, Math.random() * maxX);
+    const y = Math.max(margin, Math.random() * maxY);
 
-    // Uciekanie: losujemy pozycję, ale pilnujemy żeby przycisk nie wyszedł poza ekran
-    function moveNoButtonStrong(){
-      const padding = 12;   // margines od krawędzi
-      const w = noBtn.offsetWidth;
-      const h = noBtn.offsetHeight;
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
+  }
 
-      // większy rozrzut = „bardziej ucieka”
-      // losujemy docelowe miejsce praktycznie na całym ekranie
-      const x = rand(padding, window.innerWidth  - w - padding);
-      const y = rand(padding, window.innerHeight - h - padding);
+  // PC
+  noBtn.addEventListener("pointerenter", moveNoButtonStrong);
 
-      noBtn.style.left = x + "px";
-      noBtn.style.top  = y + "px";
-      noBtn.style.transform = "translate(0,0)";
-    }
+  // Telefon
+  noBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    moveNoButtonStrong();
+  }, { passive:false });
 
-    // PC: zbliżenie kursora
-    noBtn.addEventListener("pointerenter", moveNoButtonStrong);
+  // Na wypadek „cudem kliknięcia”
+  noBtn.addEventListener("click", (e)=>{
+    e.preventDefault();
+    moveNoButtonStrong();
+  });
 
-    // Telefon/tablet: dotyk (hover nie istnieje, więc uciekamy przy próbie tapnięcia)
-    noBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault(); // żeby nie „kliknąć” przypadkiem
-      moveNoButtonStrong();
-    }, { passive: false });
+  // Obrót telefonu / zmiana rozmiaru
+  window.addEventListener("resize", moveNoButtonStrong);
+</script>
 
-    // Bonus: jeśli ktoś jednak go trafi (szacun!), to też uciekaj
-    noBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      moveNoButtonStrong();
-    });
-
-    // Po zmianie rozmiaru ekranu (obrót telefonu) trzymaj go w granicach
-    window.addEventListener("resize", () => {
-      moveNoButtonStrong();
-    });
-  </script>
 </body>
 </html>
+

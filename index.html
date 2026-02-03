@@ -116,35 +116,60 @@
   </div>
 
   <script>
-    /* SERDUSZKA */
-    const heartsLayer = document.getElementById("hearts");
+  /* SERDUSZKA */
+  const heartsLayer = document.getElementById("hearts");
 
-    for(let i=0;i<70;i++){
-      const h = document.createElement("div");
-      h.className="heart";
-      h.textContent="❤";
-      h.style.left=Math.random()*innerWidth+"px";
-      h.style.top=Math.random()*innerHeight+"px";
-      h.style.fontSize=(14+Math.random()*20)+"px";
-      h.style.animationDuration=(0.4+Math.random())+"s";
-      heartsLayer.appendChild(h);
+  for(let i=0;i<70;i++){
+    const h = document.createElement("div");
+    h.className="heart";
+    h.textContent="❤";
+    h.style.left=Math.random()*innerWidth+"px";
+    h.style.top=Math.random()*innerHeight+"px";
+    h.style.fontSize=(14+Math.random()*20)+"px";
+    h.style.animationDuration=(0.4+Math.random())+"s";
+    heartsLayer.appendChild(h);
+  }
+
+  /* PRZYCISKI */
+  const yesBtn = document.getElementById("yesBtn");
+  const runawayBtn = document.getElementById("runawayBtn");
+
+  yesBtn.addEventListener("click", ()=>{
+    alert("💖 Wiedziałem! Najpiękniejsza walentynka na świecie 💖");
+  });
+
+  // PSYCHOLOGIA ❤️
+  const noTexts = [
+    "Nie 🙈",
+    "Na pewno nie?",
+    "Na 100%?",
+    "A może jednak…?",
+    "No weź 🥺",
+    "Nie bądź taka 💔",
+    "Ostatnia szansa 😳",
+    "Dobra… żartowałam 😅"
+  ];
+
+  let noClicks = 0;
+
+  runawayBtn.addEventListener("click", ()=>{
+    noClicks++;
+
+    if(noClicks < noTexts.length){
+      runawayBtn.textContent = noTexts[noClicks];
+    } else {
+      // finał
+      runawayBtn.style.opacity = "0";
+      runawayBtn.style.transform = "scale(0.5)";
+      setTimeout(()=>{
+        runawayBtn.remove();
+      }, 300);
     }
+  });
+</script>
 
-    /* PRZYCISKI */
-    const yesBtn = document.getElementById("yesBtn");
-    const runawayBtn = document.getElementById("runawayBtn");
-
-    yesBtn.addEventListener("click", ()=>{
-      alert("💖 Wiedziałem! Najpiękniejsza walentynka na świecie 💖");
-    });
-
-    runawayBtn.addEventListener("mouseenter", ()=>{
-      const x = Math.random()*400 - 200;
-      const y = Math.random()*240 - 120;
-      runawayBtn.style.transform = `translate(${x}px, ${y}px)`;
-    });
-  </script>
 </body>
 </html>
+
 
 
